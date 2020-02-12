@@ -42,6 +42,24 @@ impl<T> List<T> {
     pub fn peek_right_mut(&mut self) -> Option<&mut T> {
         self.right.peek_mut()
     }
+
+    pub fn go_left(&mut self) -> bool {
+        self.left
+            .pop_node()
+            .map(|node| {
+                self.right.push_node(node);
+            })
+            .is_some()
+    }
+
+    pub fn go_right(&mut self) -> bool {
+        self.right
+            .pop_node()
+            .map(|node| {
+                self.left.push_node(node);
+            })
+            .is_some()
+    }
 }
 
 #[cfg(test)]
@@ -60,6 +78,21 @@ mod test {
         list.push_left(2);
         list.push_left(3);
         list.push_right(4);
+
+        while list.go_left() {}
+
+        assert_eq!(list.pop_left(), None);
+        assert_eq!(list.pop_right(), Some(0));
+        assert_eq!(list.pop_right(), Some(2));
+
+        list.push_left(5);
+        assert_eq!(list.pop_right(), Some(3));
+        assert_eq!(list.pop_left(), Some(5));
+        assert_eq!(list.pop_right(), Some(4));
+        assert_eq!(list.pop_right(), Some(1));
+
+        assert_eq!(list.pop_right(), None);
+        assert_eq!(list.pop_left(), None);
     }
 }
 
